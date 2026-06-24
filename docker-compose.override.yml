@@ -4,7 +4,7 @@ services:
     volumes:
       - .:/var/www/html
     # composer install при каждом старте — в проде зашит в образ
-    command: sh -c "composer install --no-interaction && php-fpm"
+    command: sh -c "composer install --no-interaction && chmod -R 777 storage bootstrap/cache && php-fpm"
 
   nginx:
     volumes:
