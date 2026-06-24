@@ -1,0 +1,11 @@
+# Автоматически подхватывается Docker Compose локально, на сервере не используется
+services:
+  app:
+    volumes:
+      - .:/var/www/html
+    # composer install при каждом старте — в проде зашит в образ
+    command: sh -c "composer install --no-interaction && php-fpm"
+
+  nginx:
+    volumes:
+      - ./public:/var/www/html/public:ro
