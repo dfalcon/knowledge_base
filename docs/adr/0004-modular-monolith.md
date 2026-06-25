@@ -19,7 +19,7 @@ Modular Monolith with the **Action** pattern.
 
 Module structure:
 ```
-src/Modules/
+app/Modules/
 ├── Users/          {Controllers, Actions, Models, DTO, Events, Jobs}
 ├── Documents/      {Controllers, Actions, Models, DTO, Events, Jobs}
 ├── KnowledgeBases/ {Controllers, Actions, Models, DTO}
