@@ -39,5 +39,6 @@ jobs:
             cd ${{ secrets.DEPLOY_PATH }} &&
             git pull origin main &&
             docker compose up --build -d &&
-            docker compose exec -T app php artisan migrate --force
+            docker compose exec -T app php artisan migrate --force &&
+            docker compose restart nginx
           "
