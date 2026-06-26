@@ -1,6 +1,8 @@
 services:
   app:
     user: "${UID}:${GID}"
+    environment:
+      HOME: /tmp
     volumes:
       - .:/var/www/html
     # not needed on prod, composer install - inside docker image
