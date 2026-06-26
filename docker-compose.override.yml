@@ -1,11 +1,13 @@
 services:
   app:
+    user: "${UID}:${GID}"
     volumes:
       - .:/var/www/html
     # not needed on prod, composer install - inside docker image
     command: sh -c "composer install --no-interaction && chmod -R 777 storage bootstrap/cache && php-fpm"
 
   horizon:
+    user: "${UID}:${GID}"
     volumes:
       - .:/var/www/html
 
