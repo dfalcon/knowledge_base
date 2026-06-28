@@ -38,11 +38,11 @@ class DocumentFactory extends Factory
             'mime_type'         => fake()->randomElement(self::$mimeTypes),
             'file_size_bytes'   => fake()->numberBetween(10_000, 5_000_000),
             'status'            => 'indexed',
+            'language'          => fake()->randomElement(['english', 'ukrainian', 'french']),
             'metadata'          => [
                 'department' => $department,
                 'tags'       => $tags,
                 'year'       => fake()->numberBetween(2020, 2026),
-                'language'   => fake()->randomElement(['en', 'uk']),
             ],
         ];
     }

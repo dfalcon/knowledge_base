@@ -31,6 +31,7 @@ class Document extends Model
         'file_size_bytes',
         'status',
         'metadata',
+        'language',
         'indexed_at',
         'error_message',
     ];
