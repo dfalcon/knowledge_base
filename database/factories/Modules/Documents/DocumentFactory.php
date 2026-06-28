@@ -31,8 +31,8 @@ class DocumentFactory extends Factory
         return [
             'knowledge_base_id' => KnowledgeBase::factory(),
             'uploaded_by'       => User::factory(),
-            'title'             => fake()->sentence(4),
-            'content'           => fake()->paragraphs(3, true),
+            'title'             => fake()->realText(60),
+            'content'           => fake()->realText(800),
             'file_name'         => fake()->slug(3) . '.pdf',
             'file_path'         => 'documents/' . fake()->uuid() . '.pdf',
             'mime_type'         => fake()->randomElement(self::$mimeTypes),

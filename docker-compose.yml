@@ -22,6 +22,9 @@ services:
 
   postgres:
     image: postgres:17-alpine
+    # default random_page_cost=4.0 is tuned for HDD (random I/O = 4x sequential)
+    # on SSD random vs sequential cost is nearly equal — 1.1 makes planner prefer index scans
+    command: postgres -c random_page_cost=1.1
     environment:
       POSTGRES_DB: ${DB_DATABASE}
       POSTGRES_USER: ${DB_USERNAME}
