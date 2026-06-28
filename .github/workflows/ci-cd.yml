@@ -38,7 +38,7 @@ jobs:
           ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "
             cd ${{ secrets.DEPLOY_PATH }} &&
             git pull origin main &&
-            docker compose up --build -d &&
+            docker compose -f docker-compose.yml up --build -d &&
             docker compose exec -T app php artisan migrate --force &&
             docker compose exec -T app php artisan db:seed --class=AdminSeeder --force &&
             docker compose exec -T app php artisan l5-swagger:generate &&
