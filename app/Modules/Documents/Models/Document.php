@@ -36,6 +36,8 @@ class Document extends Model
         'error_message',
     ];
 
+    protected $hidden = ['search_vector'];
+
     protected $casts = [
         'metadata'   => 'array',
         'indexed_at' => 'datetime',
