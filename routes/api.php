@@ -25,6 +25,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/{knowledgeBase}', [KnowledgeBaseController::class, 'show']);
         Route::put('/{knowledgeBase}', [KnowledgeBaseController::class, 'update']);
         Route::delete('/{knowledgeBase}', [KnowledgeBaseController::class, 'destroy']);
+        Route::post('/{knowledgeBase}/documents', [DocumentController::class, 'store']);
         Route::post('/{knowledgeBase}/permissions', [KnowledgeBaseController::class, 'grantPermission']);
         Route::delete('/{knowledgeBase}/permissions/{user}', [KnowledgeBaseController::class, 'revokePermission']);
     });
