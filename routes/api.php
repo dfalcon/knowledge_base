@@ -1,5 +1,6 @@
 <?php
 
+use App\Modules\Chat\Controllers\ChatController;
 use App\Modules\Documents\Controllers\DocumentController;
 use App\Modules\Documents\Controllers\TagController;
 use App\Modules\KnowledgeBases\Controllers\KnowledgeBaseController;
@@ -20,6 +21,14 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::get('/documents', [DocumentController::class, 'index']);
     Route::put('/documents/{document}/tags', [TagController::class, 'syncDocument']);
+
+    Route::prefix('conversations')->group(function () {
+        Route::get('/', [ChatController::class, 'index']);
+        Route::post('/', [ChatController::class, 'store']);
+        Route::delete('/{conversation}', [ChatController::class, 'destroy']);
+        Route::get('/{conversation}/messages', [ChatController::class, 'messages']);
+        Route::post('/{conversation}/messages', [ChatController::class, 'ask']);
+    });
 
     Route::prefix('knowledge-bases')->group(function () {
         Route::get('/', [KnowledgeBaseController::class, 'index']);

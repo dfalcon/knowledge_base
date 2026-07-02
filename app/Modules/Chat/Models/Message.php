@@ -1,0 +1,32 @@
+<?php
+
+namespace App\Modules\Chat\Models;
+
+use Illuminate\Database\Eloquent\Concerns\HasUuids;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+
+class Message extends Model
+{
+    use HasUuids;
+
+    public const UPDATED_AT = null;
+
+    protected $fillable = [
+        'conversation_id',
+        'role',
+        'content',
+        'sources',
+        'tokens_used',
+    ];
+
+    protected $casts = [
+        'sources'    => 'array',
+        'created_at' => 'datetime',
+    ];
+
+    public function conversation(): BelongsTo
+    {
+        return $this->belongsTo(Conversation::class);
+    }
+}
