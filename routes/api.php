@@ -6,11 +6,14 @@ use App\Modules\Documents\Controllers\TagController;
 use App\Modules\KnowledgeBases\Controllers\KnowledgeBaseController;
 use App\Modules\Users\Controllers\AdminUserController;
 use App\Modules\Users\Controllers\AuthController;
+use App\Modules\Users\Controllers\SocialAuthController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('auth')->group(function () {
     Route::post('/register', [AuthController::class, 'register']);
     Route::post('/login', [AuthController::class, 'login']);
+    Route::get('/google', [SocialAuthController::class, 'redirect']);
+    Route::get('/google/callback', [SocialAuthController::class, 'callback']);
 });
 
 Route::middleware('auth:sanctum')->group(function () {
