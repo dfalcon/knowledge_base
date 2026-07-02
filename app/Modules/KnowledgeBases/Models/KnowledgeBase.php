@@ -2,6 +2,7 @@
 
 namespace App\Modules\KnowledgeBases\Models;
 
+use App\Modules\Documents\Models\Tag;
 use App\Modules\Users\Models\User;
 use Database\Factories\Modules\KnowledgeBases\KnowledgeBaseFactory;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
@@ -39,5 +40,10 @@ class KnowledgeBase extends Model
     public function permissions(): HasMany
     {
         return $this->hasMany(KnowledgeBasePermission::class);
+    }
+
+    public function tags(): HasMany
+    {
+        return $this->hasMany(Tag::class);
     }
 }

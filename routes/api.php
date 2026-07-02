@@ -1,6 +1,7 @@
 <?php
 
 use App\Modules\Documents\Controllers\DocumentController;
+use App\Modules\Documents\Controllers\TagController;
 use App\Modules\KnowledgeBases\Controllers\KnowledgeBaseController;
 use App\Modules\Users\Controllers\AdminUserController;
 use App\Modules\Users\Controllers\AuthController;
@@ -18,6 +19,7 @@ Route::middleware('auth:sanctum')->group(function () {
     });
 
     Route::get('/documents', [DocumentController::class, 'index']);
+    Route::put('/documents/{document}/tags', [TagController::class, 'syncDocument']);
 
     Route::prefix('knowledge-bases')->group(function () {
         Route::get('/', [KnowledgeBaseController::class, 'index']);
@@ -26,6 +28,9 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::put('/{knowledgeBase}', [KnowledgeBaseController::class, 'update']);
         Route::delete('/{knowledgeBase}', [KnowledgeBaseController::class, 'destroy']);
         Route::post('/{knowledgeBase}/documents', [DocumentController::class, 'store']);
+        Route::get('/{knowledgeBase}/tags', [TagController::class, 'index']);
+        Route::post('/{knowledgeBase}/tags', [TagController::class, 'store']);
+        Route::delete('/{knowledgeBase}/tags/{tag}', [TagController::class, 'destroy']);
         Route::post('/{knowledgeBase}/permissions', [KnowledgeBaseController::class, 'grantPermission']);
         Route::delete('/{knowledgeBase}/permissions/{user}', [KnowledgeBaseController::class, 'revokePermission']);
     });
