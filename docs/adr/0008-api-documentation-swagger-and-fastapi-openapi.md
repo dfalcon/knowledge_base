@@ -1,42 +1,20 @@
-# ADR-0008: API documentation — l5-swagger for Laravel, built-in OpenAPI for FastAPI
+# ADR-0008: API docs — l5-swagger for Laravel, built-in OpenAPI for FastAPI
 
-## Status
-Accepted
+Status: Accepted
 
-## Context
+Both services are REST; frontend devs need interactive docs, and stale docs are worse than none.
 
-Both Laravel and the Python AI Service expose pure REST APIs. Frontend and mobile developers need interactive API docs. The docs must be accurate — stale docs are worse than no docs.
+FastAPI gives OpenAPI for free from Pydantic + type hints — `/docs` and `/redoc`, zero config.
 
-**FastAPI** ships with OpenAPI out of the box. Pydantic models and type hints are enough — `/docs` (Swagger UI) and `/redoc` are available with zero configuration.
+For Laravel: scramble auto-generates from routes/FormRequests (stays in sync, but inference means less control) vs **l5-swagger**, which generates from manual `@OA\` annotations (explicit, predictable). Route count is small, so annotating by hand isn't a real burden and I get full control.
 
-**Laravel** options considered:
+Decision: l5-swagger for Laravel, FastAPI built-in for the AI service.
 
-- **dedoc/scramble** — auto-generates OpenAPI from routes, FormRequest rules, and API Resources without annotations. Docs stay in sync automatically. Downside: relies on inference, less explicit control over the output
-- **darkaonline/l5-swagger** — generates spec from `@OA\` PHPDoc annotations written manually on controllers. Explicit and predictable. The route count is small enough that the annotation overhead is manageable
+| Service | URL |
+|---|---|
+| Laravel | `/api/documentation` |
+| AI service | `/docs`, `/redoc` |
 
-## Decision
-
-**l5-swagger** (`darkaonline/l5-swagger`) for Laravel.  
-**FastAPI built-in** for the AI Service.
-
-The route count is small and many endpoints share similar structure, so manual annotations are not a significant burden. The explicitness of `@OA\` gives full control over the generated spec.
-
-URLs in development:
-
-| Service | URL | Notes |
-|---------|-----|-------|
-| Laravel API | `http://localhost:5001/api/documentation` | l5-swagger UI |
-| AI Service | `http://localhost:8000/docs` | FastAPI Swagger UI |
-| AI Service | `http://localhost:8000/redoc` | FastAPI ReDoc |
-
-## Consequences
-
-What we get:
-- Full control over request/response schema descriptions and examples
-- FastAPI docs are free — Pydantic models generate the schema automatically
-- Standard tooling that most PHP teams have encountered
-
-Where to be careful:
-- Annotations go stale: when a request field or response shape changes, the `@OA\` annotation must be updated manually. If it isn't, the docs silently lie. Treat annotation updates as part of the same commit as the code change
-- l5-swagger `/api/documentation` should be disabled or protected in production
-- FastAPI `/docs` and `/redoc` should be disabled in production via `docs_url=None` in the app constructor
+Gotchas:
+- `@OA\` annotations go stale silently — update them in the same commit as the code change.
+- Disable/protect all three doc endpoints in production (`docs_url=None` for FastAPI).

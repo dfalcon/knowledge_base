@@ -1,45 +1,19 @@
 # ADR-0005: MinIO for file storage
 
-## Status
-Accepted
+Status: Accepted
 
-## Context
+Users upload PDF/DOCX/TXT; files must live somewhere for processing and later downloads. Need on-prem object storage.
 
-Users upload documents (PDF, DOCX, TXT, and others). Those files need to live somewhere before processing and after — for downloads and re-processing. We need blob/object storage with a decent API that stays on-premise.
+- AWS S3 / GCS / Azure Blob — zero ops, but data leaves our infra. Non-starter for a corporate KB.
+- Local filesystem — doesn't scale across instances, manual backups, no real API.
+- **MinIO** — self-hosted, S3-compatible. Laravel's `s3` driver and Python `boto3` work unchanged — just swap the endpoint.
 
-Options:
+Decision: MinIO, separate service, both Laravel and the AI service talk to it over the S3 API.
 
-- **AWS S3 / Google Cloud Storage / Azure Blob** — managed, reliable, zero ops. But data leaves our infrastructure, which is a non-starter for a corporate knowledge base. Plus vendor lock-in and egress costs
-- **Local filesystem** — simplest option, but doesn't scale across multiple instances, no proper API, backups are manual
-- **MinIO** — self-hosted, S3-compatible API, written in Go, runs fine in Docker/Kubernetes. Laravel's `s3` driver and Python's `boto3` work without changes — just swap the endpoint
-
-## Decision
-
-MinIO. Deployed as a separate service; Laravel and the Python AI Service talk to it via the standard S3 API.
-
-Bucket structure:
 ```
-intellibase-documents/
-├── {knowledge_base_id}/
-│   └── {document_id}/
-│       └── original.{ext}     ← original file after upload
+intellibase-documents/{knowledge_base_id}/{document_id}/original.{ext}
 ```
 
-Access pattern:
-- Laravel → uploads the file, stores path or presigned URL in PostgreSQL
-- Python AI Service → reads the file by path for processing
-- Presigned URLs for downloads — files aren't served through the application server
+Laravel uploads and stores the path; the AI service reads by path; downloads go through presigned URLs (not through the app server).
 
-## Consequences
-
-What we get:
-- Data stays in our infrastructure
-- S3-compatible API — if we ever move to real AWS S3, we change the endpoint and credentials, nothing else
-- Laravel `s3` driver + Python `boto3` — nothing new to learn
-- MinIO Console — browse buckets and files from a browser, handy for debugging
-- Versioning and lifecycle policies available if needed
-
-Where it might hurt:
-- Another stateful service (persistent volume, backup strategy — important, files can't be recovered from the database)
-- MinIO in single-node mode has no HA — if fault tolerance becomes a requirement, we'd need distributed mode or a managed S3. Single-node is fine for early stages
-- Presigned URLs have an expiry — needs to be accounted for when generating download links
+Gotchas: it's stateful — files aren't recoverable from the DB, so back it up. Single-node MinIO has no HA (fine for early stages; distributed mode or real S3 later if needed). Presigned URLs expire — account for that when generating links.
