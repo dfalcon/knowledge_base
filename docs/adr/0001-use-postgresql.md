@@ -11,11 +11,11 @@ Looked at three options:
 
 - **MySQL 8** — familiar, but JSONB support is weak (no GIN indexes), and full-text search falls short enough to become a real problem early on
 - **MongoDB** — considered it because semi-structured document metadata maps naturally to a document store. But ACID isn't MongoDB's priority, joins require aggregation pipelines, and Atlas Search is a separate paid product. Too many trade-offs stacking up
-- **PostgreSQL 16** — ACID, `tsvector`/`tsquery` with GIN out of the box, JSONB for metadata, partial indexes. FTS is strong enough to carry stages 1–4 without Elasticsearch
+- **PostgreSQL 17** — ACID, `tsvector`/`tsquery` with GIN out of the box, JSONB for metadata, partial indexes. FTS is strong enough to carry stages 1–4 without Elasticsearch
 
 ## Decision
 
-PostgreSQL 16. One database, one zone of responsibility.
+PostgreSQL 17. One database, one zone of responsibility.
 
 ## Consequences
 
