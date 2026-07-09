@@ -2,6 +2,7 @@
 
 namespace App\Modules\Documents\Actions;
 
+use App\Modules\Documents\Jobs\PublishDocumentUploadedJob;
 use App\Modules\Documents\Models\Document;
 use App\Modules\KnowledgeBases\Models\KnowledgeBase;
 use App\Modules\Users\Models\User;
@@ -13,7 +14,7 @@ class UploadDocumentAction
     {
         $path = $file->store("documents/{$knowledgeBase->id}", 's3');
 
-        return Document::create([
+        $document = Document::create([
             'knowledge_base_id' => $knowledgeBase->id,
             'uploaded_by'       => $uploader->id,
             'title'             => $title ?? pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME),
@@ -23,5 +24,7 @@ class UploadDocumentAction
             'file_size_bytes'   => $file->getSize(),
             'status'            => 'pending',
         ]);
+        PublishDocumentUploadedJob::dispatch($document)->onQueue('documents');
+        return $document;
     }
 }

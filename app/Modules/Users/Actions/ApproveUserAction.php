@@ -17,7 +17,7 @@ class ApproveUserAction
 
         $user->syncRoles($role);
 
-        SendWelcomeEmailJob::dispatch($user)->onQueue('notification');
+        SendWelcomeEmailJob::dispatch($user)->onQueue('notifications');
 
         return $user;
     }
