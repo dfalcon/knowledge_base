@@ -2,6 +2,7 @@
 
 namespace App\Modules\Users\Actions;
 
+use App\Modules\Users\Jobs\SendWelcomeEmailJob;
 use App\Modules\Users\Models\User;
 
 class ApproveUserAction
@@ -15,6 +16,8 @@ class ApproveUserAction
         ]);
 
         $user->syncRoles($role);
+
+        SendWelcomeEmailJob::dispatch($user)->onQueue('notification');
 
         return $user;
     }

@@ -2,6 +2,7 @@
 
 namespace App\Modules\Users\Actions;
 
+use App\Modules\Users\Jobs\NotifyAdminAboutPendingUserJob;
 use App\Modules\Users\Models\User;
 
 class RegisterUserAction
@@ -16,6 +17,8 @@ class RegisterUserAction
         ]);
 
         $user->assignRole('member');
+
+        NotifyAdminAboutPendingUserJob::dispatch($user)->onQueue('critical');
 
         return $user;
     }
