@@ -34,6 +34,11 @@ class NotifyAdminAboutPendingUserJob implements ShouldQueue
     public function handle(): void
     {
         $admins = User::role('admin')->get();
+
+        if ($admins->isEmpty()) {
+            return;
+        }
+
         Mail::to($admins)->send(new AdminWaitApprove($this->user));
     }
 
