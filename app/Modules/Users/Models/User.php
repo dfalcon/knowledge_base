@@ -2,9 +2,12 @@
 
 namespace App\Modules\Users\Models;
 
+use App\Modules\Users\Enums\UserStatus;
 use Database\Factories\Modules\Users\UserFactory;
+use Illuminate\Database\Eloquent\Attributes\Appends;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Hidden;
+use Illuminate\Database\Eloquent\Attributes\UseFactory;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -14,19 +17,14 @@ use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 use Spatie\Permission\Traits\HasRoles;
 
+#[UseFactory(UserFactory::class)]
 #[Fillable(['name', 'email', 'password', 'google_id', 'status', 'approved_by', 'approved_at'])]
 #[Hidden(['password', 'remember_token', 'approved_by'])]
+#[Appends(['approved_by_name'])]
 class User extends Authenticatable
 {
     /** @use HasFactory<UserFactory> */
     use HasFactory, Notifiable, HasUuids, HasRoles, HasApiTokens;
-
-    protected $appends = ['approved_by_name'];
-
-    protected static function newFactory(): UserFactory
-    {
-        return UserFactory::new();
-    }
 
     protected function casts(): array
     {
@@ -34,6 +32,7 @@ class User extends Authenticatable
             'password'          => 'hashed',
             'email_verified_at' => 'datetime',
             'approved_at'       => 'datetime',
+            'status'            => UserStatus::class,
         ];
     }
 

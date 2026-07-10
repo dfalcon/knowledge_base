@@ -2,6 +2,7 @@
 
 namespace App\Modules\Documents\Actions;
 
+use App\Modules\Documents\Enums\DocumentStatus;
 use App\Modules\Documents\Jobs\PublishDocumentUploadedJob;
 use App\Modules\Documents\Models\Document;
 use App\Modules\KnowledgeBases\Models\KnowledgeBase;
@@ -22,7 +23,7 @@ class UploadDocumentAction
             'file_path'         => $path,
             'mime_type'         => $file->getClientMimeType(),
             'file_size_bytes'   => $file->getSize(),
-            'status'            => 'pending',
+            'status'            => DocumentStatus::Pending,
         ]);
         PublishDocumentUploadedJob::dispatch($document)->onQueue('documents');
         return $document;

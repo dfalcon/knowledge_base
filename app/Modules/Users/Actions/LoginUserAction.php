@@ -2,6 +2,7 @@
 
 namespace App\Modules\Users\Actions;
 
+use App\Modules\Users\Enums\UserStatus;
 use App\Modules\Users\Models\User;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Support\Facades\Auth;
@@ -20,7 +21,7 @@ class LoginUserAction
         /** @var User $user */
         $user = Auth::user();
 
-        if ($user->status !== 'active') {
+        if ($user->status !== UserStatus::Active) {
             Auth::logout();
             throw new AuthenticationException('Your account is pending approval.');
         }

@@ -2,6 +2,7 @@
 
 namespace App\Modules\Users\Actions;
 
+use App\Modules\Users\Enums\UserStatus;
 use App\Modules\Users\Models\User;
 use Illuminate\Auth\AuthenticationException;
 use Laravel\Socialite\Contracts\User as SocialiteUser;
@@ -23,12 +24,12 @@ class HandleGoogleCallbackAction
                 'email'     => $googleUser->getEmail(),
                 'google_id' => $googleUser->getId(),
                 'password'  => null,
-                'status'    => 'pending',
+                'status'    => UserStatus::Pending,
             ]);
             $user->assignRole('member');
         }
 
-        if ($user->status !== 'active') {
+        if ($user->status !== UserStatus::Active) {
             throw new AuthenticationException('Your account is pending approval.');
         }
 

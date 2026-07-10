@@ -5,32 +5,27 @@ namespace App\Modules\KnowledgeBases\Models;
 use App\Modules\Documents\Models\Tag;
 use App\Modules\Users\Models\User;
 use Database\Factories\Modules\KnowledgeBases\KnowledgeBaseFactory;
+use Illuminate\Database\Eloquent\Attributes\Fillable;
+use Illuminate\Database\Eloquent\Attributes\UseFactory;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
+#[UseFactory(KnowledgeBaseFactory::class)]
+#[Fillable(['name', 'slug', 'is_public', 'owner_id'])]
 class KnowledgeBase extends Model
 {
     /** @use HasFactory<KnowledgeBaseFactory> */
     use HasFactory, HasUuids;
 
-    protected static function newFactory(): KnowledgeBaseFactory
+    protected function casts(): array
     {
-        return KnowledgeBaseFactory::new();
+        return [
+            'is_public' => 'boolean',
+        ];
     }
-
-    protected $fillable = [
-        'name',
-        'slug',
-        'is_public',
-        'owner_id',
-    ];
-
-    protected $casts = [
-        'is_public' => 'boolean',
-    ];
 
     public function owner(): BelongsTo
     {

@@ -1,5 +1,6 @@
 <?php
 
+use App\Modules\Users\Enums\UserStatus;
 use App\Modules\Users\Models\User;
 use Laravel\Sanctum\Sanctum;
 
@@ -22,7 +23,7 @@ it('lets an admin approve a pending user', function () {
         ->assertJsonPath('status', 'active');
 
     $pending->refresh();
-    expect($pending->status)->toBe('active');
+    expect($pending->status)->toBe(UserStatus::Active);
     expect($pending->approved_at)->not->toBeNull();
     expect($pending->hasRole('member'))->toBeTrue();
 });
@@ -37,7 +38,7 @@ it('forbids a non-admin from approving', function () {
     $this->postJson("/api/admin/users/{$pending->id}/approve")
         ->assertForbidden();
 
-    expect($pending->fresh()->status)->toBe('pending');
+    expect($pending->fresh()->status)->toBe(UserStatus::Pending);
 });
 
 it('rejects an unauthenticated request', function () {

@@ -1,5 +1,6 @@
 <?php
 
+use App\Modules\Users\Enums\UserStatus;
 use App\Modules\Users\Models\User;
 
 beforeEach(fn () => seedRoles());
@@ -17,7 +18,7 @@ it('registers a user as pending', function () {
 
     $user = User::where('email', 'john@example.com')->first();
     expect($user)->not->toBeNull();
-    expect($user->status)->toBe('pending');
+    expect($user->status)->toBe(UserStatus::Pending);
     expect($user->hasRole('member'))->toBeTrue();
 
     expect($user->password)->not->toBe('secret123'); // pass should be hashed

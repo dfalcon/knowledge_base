@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Modules\Users\Enums\UserStatus;
 use App\Modules\Users\Models\User;
 use Illuminate\Database\Seeder;
 use Spatie\Permission\Models\Role;
@@ -18,7 +19,7 @@ class AdminSeeder extends Seeder
             [
                 'name'     => 'Admin',
                 'password' => 'demo1234',
-                'status'   => 'active',
+                'status'   => UserStatus::Active,
             ]
         );
 

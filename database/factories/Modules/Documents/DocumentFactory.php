@@ -2,6 +2,7 @@
 
 namespace Database\Factories\Modules\Documents;
 
+use App\Modules\Documents\Enums\DocumentStatus;
 use App\Modules\Documents\Models\Document;
 use App\Modules\KnowledgeBases\Models\KnowledgeBase;
 use App\Modules\Users\Models\User;
@@ -37,7 +38,7 @@ class DocumentFactory extends Factory
             'file_path'         => 'documents/' . fake()->uuid() . '.pdf',
             'mime_type'         => fake()->randomElement(self::$mimeTypes),
             'file_size_bytes'   => fake()->numberBetween(10_000, 5_000_000),
-            'status'            => 'indexed',
+            'status'            => DocumentStatus::Indexed,
             'language'          => fake()->randomElement(['english', 'ukrainian', 'french']),
             'metadata'          => [
                 'department' => $department,
@@ -49,7 +50,7 @@ class DocumentFactory extends Factory
 
     public function pending(): static
     {
-        return $this->state(['status' => 'pending']);
+        return $this->state(['status' => DocumentStatus::Pending]);
     }
 
     public function forKnowledgeBase(KnowledgeBase $kb): static

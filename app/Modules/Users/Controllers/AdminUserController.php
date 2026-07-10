@@ -4,6 +4,7 @@ namespace App\Modules\Users\Controllers;
 
 use App\Http\Controllers\Controller;
 use App\Modules\Users\Actions\ApproveUserAction;
+use App\Modules\Users\Enums\UserStatus;
 use App\Modules\Users\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -25,7 +26,7 @@ class AdminUserController extends Controller
     )]
     public function pending(): JsonResponse
     {
-        return response()->json(User::where('status', 'pending')->get());
+        return response()->json(User::where('status', UserStatus::Pending)->get());
     }
 
     #[OA\Post(

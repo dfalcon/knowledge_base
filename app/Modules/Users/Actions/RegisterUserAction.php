@@ -2,6 +2,7 @@
 
 namespace App\Modules\Users\Actions;
 
+use App\Modules\Users\Enums\UserStatus;
 use App\Modules\Users\Jobs\NotifyAdminAboutPendingUserJob;
 use App\Modules\Users\Models\User;
 
@@ -13,7 +14,7 @@ class RegisterUserAction
             'name'     => $name,
             'email'    => $email,
             'password' => $password,
-            'status'   => 'pending',
+            'status'   => UserStatus::Pending,
         ]);
 
         $user->assignRole('member');
