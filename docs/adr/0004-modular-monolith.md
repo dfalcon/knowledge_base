@@ -14,6 +14,6 @@ app/Modules/
 └── Chat/           {Controllers, Actions, Models, DTO}
 ```
 
-One rule: modules don't import each other's classes. Cross-module talk goes through Laravel Events or an explicit interface in `shared/` (e.g. Documents → Chat via `DocumentIndexed`). When a module needs its own scaling, this line is where you cut it out to a service.
+One rule, and it constrains behaviour, not data: modules reference each other's Eloquent models freely (the foreign keys `Document` → `KnowledgeBase` → `User` make that unavoidable in a monolith). Cross-module *logic* lives in a Service owned by the module that owns the data (`KnowledgeBases\Services\PermissionService`), and asynchronous side effects go through Jobs/Events, never a direct call into another module's Actions. When a module needs its own scaling, the async seam is where you cut it out to a service — which is exactly how the Python AI worker will detach.
 
 The rule is discipline-only for now. If a second developer shows up, add Deptrac to enforce it. (Action pattern → ADR-0010.)

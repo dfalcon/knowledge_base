@@ -15,6 +15,6 @@ public function store(UploadDocumentRequest $r, KnowledgeBase $kb, UploadDocumen
 }
 ```
 
-Validation → FormRequest. An Action's constructor injects only what that one use case needs, so reading it tells you the whole blast radius. Editing upload can't break listing — different files. Genuinely shared logic (e.g. permission checks) goes in a small `shared/` Service; Service is the exception, not the default home.
+Validation → FormRequest. An Action's constructor injects only what that one use case needs, so reading it tells you the whole blast radius. Editing upload can't break listing — different files. Genuinely shared logic (e.g. permission checks) goes in a Service owned by the module that holds the data — today that is `KnowledgeBases\Services\PermissionService`, called directly by the Documents module. There is no `shared/` directory; one cross-module Service does not earn one. Service is the exception, not the default home.
 
 The trade is more files. Worth it — many small honest classes beat a few fat ones. Don't add a second public method to an Action because it feels related; a second use case is a second Action.
