@@ -30,7 +30,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/', [ChatController::class, 'store']);
         Route::delete('/{conversation}', [ChatController::class, 'destroy']);
         Route::get('/{conversation}/messages', [ChatController::class, 'messages']);
-        Route::post('/{conversation}/messages', [ChatController::class, 'ask']);
+        Route::post('/{conversation}/messages', [ChatController::class, 'ask'])->middleware('throttle:chat');
     });
 
     Route::prefix('knowledge-bases')->group(function () {
