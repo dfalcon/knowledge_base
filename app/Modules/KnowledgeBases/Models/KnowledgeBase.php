@@ -30,7 +30,6 @@ class KnowledgeBase extends Model
 
     protected static function booted(): void
     {
-        // При удалении базы сбрасываем permission-кэш всех юзеров по ней.
         static::deleted(function (KnowledgeBase $knowledgeBase): void {
             Cache::tags(["kb:{$knowledgeBase->id}"])->flush();
         });

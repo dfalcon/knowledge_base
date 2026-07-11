@@ -8,10 +8,6 @@ use Illuminate\Support\Facades\Cache;
 
 class PermissionService
 {
-    /**
-     * Теги дают инвалидацию с двух сторон: grant/revoke флашит user:X, удаление
-     * базы флашит kb:Y. Общий тег kb-permissions — на случай сброса всего разом.
-     */
     public function canRead(User $user, KnowledgeBase $knowledgeBase): bool
     {
         if ($knowledgeBase->owner_id === $user->id || $knowledgeBase->is_public || $user->hasRole('admin')) {
