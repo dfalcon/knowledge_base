@@ -4,6 +4,7 @@ namespace App\Modules\KnowledgeBases\Services;
 
 use App\Modules\KnowledgeBases\Models\KnowledgeBase;
 use App\Modules\Users\Models\User;
+use Illuminate\Support\Facades\Cache;
 
 class PermissionService
 {
@@ -12,8 +13,7 @@ class PermissionService
         if ($knowledgeBase->owner_id === $user->id || $knowledgeBase->is_public || $user->hasRole('admin')) {
             return true;
         }
-
-        return $knowledgeBase->permissions()->where('user_id', $user->id)->where('can_read', true)->exists();
+        return Cache::remember("user:{$user->id}:kb-permissions", 300, fn () => $knowledgeBase->permissions()->where('user_id', $user->id)->where('can_read', true)->exists());
     }
 
     public function canWrite(User $user, KnowledgeBase $knowledgeBase): bool
