@@ -1,6 +1,7 @@
 <?php
 
 use App\Modules\KnowledgeBases\Actions\GrantPermissionAction;
+use App\Modules\KnowledgeBases\Actions\RevokePermissionAction;
 use App\Modules\KnowledgeBases\Models\KnowledgeBase;
 use App\Modules\KnowledgeBases\Services\PermissionService;
 use App\Modules\Users\Models\User;
@@ -41,21 +42,32 @@ it('returns the cached result even after the row is gone', function () {
 
     expect($service->canRead($this->user, $this->kb))->toBeTrue();  // cache true
 
-    // delete the row directly — bypassing GrantPermissionAction, so no Cache::forget
+    // delete the row directly — bypassing the actions, so no cache invalidation
     $this->kb->permissions()->where('user_id', $this->user->id)->delete();
 
     // the DB would now say false, but the answer comes from cache → still true
     expect($service->canRead($this->user, $this->kb))->toBeTrue();
 });
 
-it('re-reads the database after invalidation', function () {
+it('re-reads the database after revoke flushes the user tag', function () {
     $service = app(PermissionService::class);
 
     expect($service->canRead($this->user, $this->kb))->toBeTrue();
 
-    // revoke access with cache invalidation
-    $this->kb->permissions()->where('user_id', $this->user->id)->delete();
-    Cache::forget("user:{$this->user->id}:kb-permissions");
+    app(RevokePermissionAction::class)->execute($this->kb, $this->user);
 
+    expect($service->canRead($this->user, $this->kb))->toBeFalse();
+});
+
+it('flushes the permission cache when the knowledge base is deleted', function () {
+    $service = app(PermissionService::class);
+
+    expect($service->canRead($this->user, $this->kb))->toBeTrue();  // cache true
+
+    // drop the row too, then delete the KB → deleted event flushes tag kb:Y
+    $this->kb->permissions()->where('user_id', $this->user->id)->delete();
+    $this->kb->delete();
+
+    // cache is gone → falls through to DB, which now has no row
     expect($service->canRead($this->user, $this->kb))->toBeFalse();
 });

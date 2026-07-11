@@ -8,12 +8,21 @@ use Illuminate\Support\Facades\Cache;
 
 class PermissionService
 {
+    /**
+     * Теги дают инвалидацию с двух сторон: grant/revoke флашит user:X, удаление
+     * базы флашит kb:Y. Общий тег kb-permissions — на случай сброса всего разом.
+     */
     public function canRead(User $user, KnowledgeBase $knowledgeBase): bool
     {
         if ($knowledgeBase->owner_id === $user->id || $knowledgeBase->is_public || $user->hasRole('admin')) {
             return true;
         }
-        return Cache::remember("user:{$user->id}:kb-permissions", 300, fn () => $knowledgeBase->permissions()->where('user_id', $user->id)->where('can_read', true)->exists());
+
+        return Cache::tags(['kb-permissions', "user:{$user->id}", "kb:{$knowledgeBase->id}"])->remember(
+            "user:{$user->id}:kb-permissions:{$knowledgeBase->id}",
+            300,
+            fn () => $knowledgeBase->permissions()->where('user_id', $user->id)->where('can_read', true)->exists(),
+        );
     }
 
     public function canWrite(User $user, KnowledgeBase $knowledgeBase): bool

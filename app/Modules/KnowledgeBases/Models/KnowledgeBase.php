@@ -12,6 +12,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Facades\Cache;
 
 #[UseFactory(KnowledgeBaseFactory::class)]
 #[Fillable(['name', 'slug', 'is_public', 'owner_id'])]
@@ -25,6 +26,14 @@ class KnowledgeBase extends Model
         return [
             'is_public' => 'boolean',
         ];
+    }
+
+    protected static function booted(): void
+    {
+        // При удалении базы сбрасываем permission-кэш всех юзеров по ней.
+        static::deleted(function (KnowledgeBase $knowledgeBase): void {
+            Cache::tags(["kb:{$knowledgeBase->id}"])->flush();
+        });
     }
 
     public function owner(): BelongsTo

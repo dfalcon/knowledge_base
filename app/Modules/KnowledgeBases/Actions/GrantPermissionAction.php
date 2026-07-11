@@ -11,7 +11,7 @@ class GrantPermissionAction
 {
     public function execute(KnowledgeBase $knowledgeBase, User $target, User $grantedBy, bool $canRead = true, bool $canWrite = false): KnowledgeBasePermission
     {
-        Cache::forget("user:{$target->id}:kb-permissions");
+        Cache::tags(["user:{$target->id}"])->flush();
 
         return $knowledgeBase->permissions()->updateOrCreate(
             ['user_id' => $target->id],

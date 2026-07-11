@@ -3,6 +3,7 @@
 namespace App\Modules\KnowledgeBases\Actions;
 
 use App\Modules\KnowledgeBases\Models\KnowledgeBase;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Str;
 
 class UpdateKnowledgeBaseAction
@@ -21,6 +22,8 @@ class UpdateKnowledgeBaseAction
         }
 
         $knowledgeBase->update($data);
+
+        Cache::tags(["user:{$knowledgeBase->owner_id}"])->flush();
 
         return $knowledgeBase->fresh();
     }

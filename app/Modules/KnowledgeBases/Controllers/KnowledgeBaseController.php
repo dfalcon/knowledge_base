@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Modules\KnowledgeBases\Actions\CreateKnowledgeBaseAction;
 use App\Modules\KnowledgeBases\Actions\GrantPermissionAction;
 use App\Modules\KnowledgeBases\Actions\ListKnowledgeBasesAction;
+use App\Modules\KnowledgeBases\Actions\RevokePermissionAction;
 use App\Modules\KnowledgeBases\Actions\UpdateKnowledgeBaseAction;
 use App\Modules\KnowledgeBases\Models\KnowledgeBase;
 use App\Modules\KnowledgeBases\Requests\CreateKnowledgeBaseRequest;
@@ -202,11 +203,11 @@ class KnowledgeBaseController extends Controller
             new OA\Response(response: 403, description: 'Forbidden'),
         ]
     )]
-    public function revokePermission(KnowledgeBase $knowledgeBase, User $user, Request $request): JsonResponse
+    public function revokePermission(KnowledgeBase $knowledgeBase, User $user, Request $request, RevokePermissionAction $action): JsonResponse
     {
         $this->authorizeOwner($request->user(), $knowledgeBase);
 
-        $knowledgeBase->permissions()->where('user_id', $user->id)->delete();
+        $action->execute($knowledgeBase, $user);
 
         return response()->json(null, 204);
     }
