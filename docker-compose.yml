@@ -52,6 +52,21 @@ services:
       interval: 5s
       retries: 5
 
+  rabbitmq:
+    image: rabbitmq:4-management-alpine
+    environment:
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_USER}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASSWORD}
+    volumes:
+      - ../docker/rabbitmq_data:/var/lib/rabbitmq
+    ports:
+      - "5672:5672"     # AMQP 0-9-1
+      - "15672:15672"   # Management UI (http://localhost:15672)
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "-q", "ping"]
+      interval: 10s
+      retries: 5
+
   horizon:
     build: .
     env_file: .env
