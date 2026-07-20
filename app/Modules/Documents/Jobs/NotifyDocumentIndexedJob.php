@@ -3,18 +3,18 @@
 namespace App\Modules\Documents\Jobs;
 
 use App\Modules\Documents\Enums\DocumentStatus;
+use App\Modules\Documents\Events\DocumentIndexedEvent;
 use App\Modules\Documents\Mail\DocumentIndexed;
 use App\Modules\Documents\Models\Document;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
+use JsonException;
 use Throwable;
+use TypeError;
 use VladimirYuldashev\LaravelQueueRabbitMQ\Queue\Jobs\RabbitMQJob;
 
 /**
- * Consumer события `document.indexed` из RabbitMQ (routing key `document.indexed`,
- * очередь `laravel.notifications`). Публикуется не Laravel'ом (Python AI-сервисом,
- * либо вручную через Management UI), поэтому payload — сырой JSON, а не
- * Laravel-конверт джобы. Отсюда переопределение fire() вместо обычного handle().
+ * consume rabbitmq from artisan queue:work -queue="queue_name"
  */
 class NotifyDocumentIndexedJob extends RabbitMQJob
 {
@@ -24,12 +24,26 @@ class NotifyDocumentIndexedJob extends RabbitMQJob
 
     public function fire(): void
     {
-        $payload = json_decode($this->getRawBody(), true);
+        try {
+            $event = DocumentIndexedEvent::fromJson($this->getRawBody());
+        } catch (JsonException|TypeError $e) {
+            Log::warning('NotifyDocumentIndexedJob: malformed payload', [
+                'body'  => $this->getRawBody(),
+                'error' => $e->getMessage(),
+            ]);
+            $this->delete();
 
-        $document = Document::find($payload['document_id'] ?? null);
+            return;
+        }
+
+        if ($event->version !== '1.0') {
+            Log::warning('NotifyDocumentIndexedJob: unexpected event version', ['version' => $event->version]);
+        }
+
+        $document = Document::find($event->documentId);
 
         if (! $document) {
-            Log::warning('NotifyDocumentIndexedJob: document not found', ['payload' => $payload]);
+            Log::warning('NotifyDocumentIndexedJob: document not found', ['document_id' => $event->documentId]);
             $this->delete();
 
             return;

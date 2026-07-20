@@ -2,6 +2,7 @@
 
 namespace App\Modules\Documents\Jobs;
 
+use App\Modules\Documents\Events\DocumentUploadedEvent;
 use App\Modules\Documents\Models\Document;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
@@ -25,18 +26,10 @@ class PublishDocumentUploadedJob implements ShouldQueue
 
     public function handle(): void
     {
-        // routing key 'document.uploaded' — уже забинжен на intellibase.events
-        // → очередь ai.document-processing (ADR-0002), топология настроена вручную в День 2
-        QueueFacade::connection('rabbitmq')->pushRaw(
-            json_encode([
-                'document_id'       => $this->document->id,
-                'knowledge_base_id' => $this->document->knowledge_base_id,
-                'file_path'         => $this->document->file_path,
-                'mime_type'         => $this->document->mime_type,
-                'uploaded_at'       => now()->toIso8601String(),
-            ]),
-            'document.uploaded',
-        );
+        $event = DocumentUploadedEvent::fromDocument($this->document);
+
+        // 'document.uploaded' here is the routing key, not a queue name
+        QueueFacade::connection('rabbitmq')->pushRaw($event->toJson(), 'document.uploaded');
 
         Log::info('Document uploaded event published to RabbitMQ', ['document_id' => $this->document->id]);
     }
