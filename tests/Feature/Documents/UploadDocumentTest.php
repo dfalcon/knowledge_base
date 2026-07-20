@@ -4,12 +4,14 @@ use App\Modules\Documents\Models\Document;
 use App\Modules\KnowledgeBases\Models\KnowledgeBase;
 use App\Modules\Users\Models\User;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Queue;
 use Illuminate\Support\Facades\Storage;
 use Laravel\Sanctum\Sanctum;
 
 beforeEach(function () {
     seedRoles();
     Storage::fake('s3');
+    Queue::fake();
 });
 
 it('stores the file in s3 and a row in the database', function () {
