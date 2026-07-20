@@ -7,6 +7,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
 use Illuminate\Queue\Attributes\WithoutRelations;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Queue as QueueFacade;
 use Throwable;
 
 class PublishDocumentUploadedJob implements ShouldQueue
@@ -24,8 +25,20 @@ class PublishDocumentUploadedJob implements ShouldQueue
 
     public function handle(): void
     {
-        //it shopuld be feature interact with fast api python service
-        Log::info('Document uploaded, pending publish', ['document_id' => $this->document->id]);
+        // routing key 'document.uploaded' — уже забинжен на intellibase.events
+        // → очередь ai.document-processing (ADR-0002), топология настроена вручную в День 2
+        QueueFacade::connection('rabbitmq')->pushRaw(
+            json_encode([
+                'document_id'       => $this->document->id,
+                'knowledge_base_id' => $this->document->knowledge_base_id,
+                'file_path'         => $this->document->file_path,
+                'mime_type'         => $this->document->mime_type,
+                'uploaded_at'       => now()->toIso8601String(),
+            ]),
+            'document.uploaded',
+        );
+
+        Log::info('Document uploaded event published to RabbitMQ', ['document_id' => $this->document->id]);
     }
 
     public function failed(?Throwable $e): void

@@ -90,6 +90,7 @@ return [
                 'queue' => [
                     'exchange' => env('RABBITMQ_EXCHANGE', 'intellibase.events'),
                     'exchange_type' => 'topic',
+                    'job' => \App\Modules\Documents\Jobs\NotifyDocumentIndexedJob::class,
                 ],
             ],
         ],
