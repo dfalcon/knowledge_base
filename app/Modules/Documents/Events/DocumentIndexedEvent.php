@@ -10,6 +10,7 @@ final readonly class DocumentIndexedEvent
     public function __construct(
         public string $documentId,
         public DateTimeImmutable $timestamp,
+        public string $messageId,
         public string $version = '1.0',
     ) {}
 
@@ -18,6 +19,7 @@ final readonly class DocumentIndexedEvent
         return new self(
             documentId: $data['document_id'],
             timestamp: new DateTimeImmutable($data['timestamp'] ?? 'now'),
+            messageId: $data['message_id'],
             version: $data['version'] ?? '1.0',
         );
     }
